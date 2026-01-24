@@ -140,7 +140,7 @@ class StockScanner:
                 page += 1
 
                 # 避免请求过快
-                time.sleep(0.1)
+                time.sleep(1.0)
 
             except Exception as e:
                 print(f"获取第{page}页失败: {e}")
@@ -233,7 +233,7 @@ class StockScanner:
 
                 if i % 50 == 0:
                     print(f"  进度: {i}/{len(stocks)}")
-                    time.sleep(0.1)  # 避免请求过快
+                    time.sleep(1.0)  # 避免请求过快
 
             except Exception as e:
                 print(f"  [{i}/{len(stocks)}] ✗ {stock['code']}: {e}")

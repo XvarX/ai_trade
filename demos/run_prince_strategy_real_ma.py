@@ -136,9 +136,9 @@ def main(target_count=10):
             # 每30只显示进度
             if i % 30 == 0:
                 print(f"  进度: {i}/{len(hot_stocks)} - 已找到 {len(qualified)} 只")
-                time.sleep(0.5)  # 避免请求过快
+                time.sleep(1.0)  # 避免请求过快
             else:
-                time.sleep(0.1)  # 基本延迟
+                time.sleep(1.0)  # 基本延迟
 
         except Exception as e:
             # 修复：添加错误日志

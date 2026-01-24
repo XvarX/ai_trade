@@ -104,7 +104,7 @@ def main():
                 print(f"  进度: {i}/{len(hot_stocks)}")
 
             # 避免请求过快
-            time.sleep(0.05)
+            time.sleep(1.0)
 
         except Exception as e:
             print(f"  [{i}] ✗ {stock.get('name', code)}: {e}")
