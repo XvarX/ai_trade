@@ -9,7 +9,7 @@
 STRATEGY_NAME = "王子战法"
 STRATEGY_DESCRIPTION = "阴线且MA5大于MA20且换手率大于5%"
 STRATEGY_AUTHOR = "AI"
-STRATEGY_VERSION = "1.0.0"
+STRATEGY_VERSION = "1.1.0"
 STRATEGY_CATEGORY = "custom"
 STRATEGY_TAGS = ["筛选", "自定义"]
 
@@ -80,6 +80,3 @@ def screen(stock_data, **params):
 
     # 返回是否所有条件都满足
     return all(conditions_met)
-
-    # 所有条件都满足
-    return True

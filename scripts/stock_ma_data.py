@@ -29,59 +29,75 @@ class MADataAPI:
             self.akshare = ak
             print("✓ AKShare 安装成功")
 
-    def get_stock_history(self, symbol: str, days: int = 60) -> Optional[pd.DataFrame]:
+    def get_stock_history(self, symbol: str, days: int = 60, max_retries: int = 3) -> Optional[pd.DataFrame]:
         """
-        获取股票历史数据
+        获取股票历史数据（带重试机制）
 
         参数:
             symbol: 股票代码（如 '601318' 或 '000001'）
             days: 获取最近多少天的数据
+            max_retries: 最大重试次数（默认3次）
 
         返回:
             DataFrame with columns: 日期, 开盘, 收盘, 最高, 最低, 成交量, etc.
         """
-        try:
-            # 计算日期范围
-            end_date = datetime.now().strftime('%Y%m%d')
-            start_date = (datetime.now() - timedelta(days=days)).strftime('%Y%m%d')
+        for attempt in range(max_retries):
+            try:
+                # 计算日期范围
+                end_date = datetime.now().strftime('%Y%m%d')
+                start_date = (datetime.now() - timedelta(days=days)).strftime('%Y%m%d')
 
-            # 获取历史数据
-            df = self.akshare.stock_zh_a_hist(
-                symbol=symbol,
-                period="daily",
-                start_date=start_date,
-                end_date=end_date,
-                adjust=""
-            )
+                # 获取历史数据
+                df = self.akshare.stock_zh_a_hist(
+                    symbol=symbol,
+                    period="daily",
+                    start_date=start_date,
+                    end_date=end_date,
+                    adjust=""
+                )
 
-            if df is None or df.empty:
-                return None
+                if df is None or df.empty:
+                    return None
 
-            # 重命名列（AKShare返回的是中文列名）
-            df = df.rename(columns={
-                '日期': 'date',
-                '开盘': 'open',
-                '收盘': 'close',
-                '最高': 'high',
-                '最低': 'low',
-                '成交量': 'volume',
-                '成交额': 'amount',
-                '涨跌幅': 'change_percent',
-                '涨跌额': 'change_amount',
-                '换手率': 'turnover_rate'
-            })
+                # 重命名列（AKShare返回的是中文列名）
+                df = df.rename(columns={
+                    '日期': 'date',
+                    '开盘': 'open',
+                    '收盘': 'close',
+                    '最高': 'high',
+                    '最低': 'low',
+                    '成交量': 'volume',
+                    '成交额': 'amount',
+                    '涨跌幅': 'change_percent',
+                    '涨跌额': 'change_amount',
+                    '换手率': 'turnover_rate'
+                })
 
-            # 计算MA均线
-            df['MA5'] = df['close'].rolling(window=5).mean()
-            df['MA10'] = df['close'].rolling(window=10).mean()
-            df['MA20'] = df['close'].rolling(window=20).mean()
-            df['MA30'] = df['close'].rolling(window=30).mean()
+                # 计算MA均线
+                df['MA5'] = df['close'].rolling(window=5).mean()
+                df['MA10'] = df['close'].rolling(window=10).mean()
+                df['MA20'] = df['close'].rolling(window=20).mean()
+                df['MA30'] = df['close'].rolling(window=30).mean()
 
-            return df
+                return df
 
-        except Exception as e:
-            print(f"获取 {symbol} 历史数据失败: {e}")
-            return None
+            except Exception as e:
+                error_msg = str(e)
+                # 网络相关错误，值得重试
+                network_errors = ['Connection', 'Timeout', 'Remote', 'Network']
+                is_network_error = any(err in error_msg for err in network_errors)
+
+                if is_network_error and attempt < max_retries - 1:
+                    # 指数退避：2秒, 4秒, 8秒
+                    wait_time = 2 ** (attempt + 1)
+                    print(f"获取 {symbol} 失败 (尝试 {attempt + 1}/{max_retries}): {error_msg[:50]}")
+                    print(f"  等待 {wait_time} 秒后重试...")
+                    time.sleep(wait_time)
+                    continue
+                else:
+                    # 最后一次尝试或非网络错误，直接失败
+                    print(f"获取 {symbol} 历史数据失败: {error_msg[:80]}")
+                    return None
 
     def get_current_ma(self, symbol: str) -> Optional[Dict]:
         """
