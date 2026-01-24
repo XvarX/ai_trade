@@ -1,13 +1,13 @@
 """
 战法名称: 王子战法
-战法描述: 阴线且MA5大于MA10且换手率大于5%
+战法描述: 阴线且MA5大于MA20且换手率大于5%
 作者: AI
-版本: 1.0.0
+版本: 1.1.0
 """
 
 # 战法元数据
 STRATEGY_NAME = "王子战法"
-STRATEGY_DESCRIPTION = "阴线且MA5大于MA10且换手率大于5%"
+STRATEGY_DESCRIPTION = "阴线且MA5大于MA20且换手率大于5%"
 STRATEGY_AUTHOR = "AI"
 STRATEGY_VERSION = "1.0.0"
 STRATEGY_CATEGORY = "custom"
@@ -18,7 +18,7 @@ def get_default_params():
     """获取默认参数"""
     return {
         'ma5': None,  # 需要提供
-        'ma10': None,  # 需要提供
+        'ma20': None,  # 需要提供
         'min_turnover': 5.0,
     }
 
@@ -27,7 +27,7 @@ def get_params_schema():
     """获取参数模式"""
     return {
         'ma5': {'type': 'float', 'description': 'ma5参数'},
-        'ma10': {'type': 'float', 'description': 'ma10参数'},
+        'ma20': {'type': 'float', 'description': 'ma20参数'},
         'min_turnover': {'type': 'float', 'description': 'min_turnover参数'},
     }
 
@@ -64,10 +64,10 @@ def screen(stock_data, **params):
     # 筛选条件检查
     conditions_met = []
 
-    # 均线条件: MA5 > MA10
+    # 均线条件: MA5 > MA20
     ma5 = params.get('ma5', 0)
-    ma10 = params.get('ma10', 0)
-    conditions_met.append(ma5 > ma10)
+    ma20 = params.get('ma20', 0)
+    conditions_met.append(ma5 > ma20)
 
 
     # K线形态: 阴线

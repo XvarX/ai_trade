@@ -28,7 +28,7 @@ class AIStockAssistant:
     def query_stock(self, stock_code: str) -> Dict:
         """
         查询单个股票信息
-        stock_code: 股票代码，如 '601318' (中国平安)
+        stock_code: 股票代码 (6位数字，如601318)
         返回股票信息字典
         """
         try:
@@ -237,7 +237,7 @@ class AIStockAssistant:
 def get_stock_info(stock_code: str) -> str:
     """
     快速查询股票信息
-    用法: get_stock_info('601318')
+    用法: get_stock_info('STOCK_CODE')
     """
     assistant = AIStockAssistant()
     return assistant.get_stock_price_simple(stock_code)
@@ -246,7 +246,7 @@ def get_stock_info(stock_code: str) -> str:
 def analyze_stock(stock_code: str) -> str:
     """
     分析股票
-    用法: analyze_stock('601318')
+    用法: analyze_stock('STOCK_CODE')
     """
     assistant = AIStockAssistant()
     result = assistant.analyze_stock(stock_code)

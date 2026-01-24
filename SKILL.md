@@ -1,52 +1,41 @@
 ---
 name: a-stock-query
-description: Chinese A-share stock market query and analysis framework with AI-powered strategy system. Provides real-time stock quotes (Tencent/Sina/Eastmoney APIs), technical indicators (MA, candlestick, turnover rate), full market scanner (5506 A-shares), and unique strategy system that generates code from natural language descriptions. Use when: (1) User asks about current stock prices or market data for Chinese A-shares (e.g., "现在中国平安什么价格", "查询贵州茅台"), (2) User wants to create custom stock screening strategies from natural language (e.g., "新增战法-筛选:王子战法 阴线且MA5大于MA10且换手率大于5%"), (3) User requests technical analysis like moving averages, trends, candlestick patterns, (4) User wants to scan the entire A-share market for specific conditions, (5) Any query involving Chinese stock codes (601318, 600519, 000001, 002594, etc.). Features: AI-generated strategies from descriptions, real market data with turnover rates, strategy import/export for sharing, batch querying, comprehensive technical analysis.
+description: Chinese A-share stock market query and analysis framework with AI-powered strategy system. Provides real-time stock quotes (Tencent/Sina/Eastmoney APIs), technical indicators (MA, candlestick, turnover rate), full market scanner (5506 A-shares), and flexible strategy system that generates code from natural language descriptions. Use when: (1) User asks about current stock prices or market data for Chinese A-shares, (2) User wants to create custom stock screening strategies from natural language descriptions, (3) User requests technical analysis like moving averages, trends, candlestick patterns, (4) User wants to scan the A-share market with custom filters, (5) Any query involving Chinese stock codes. Features: AI-generated strategies from descriptions, real market data with turnover rates, strategy import/export for sharing, batch querying, comprehensive technical analysis.
 ---
 
 # A股查询与战法系统
 
-Complete Chinese A-share market analysis framework with AI-powered strategy generation.
+Chinese A-share market analysis framework with flexible AI-powered strategy generation.
 
-## 🚀 Quick Start for Claude
+## Overview
 
-### Query Stock Prices
+This is a **generic framework** for querying Chinese A-share stock data and creating custom screening strategies. It does NOT contain pre-built strategies or fixed screening patterns - all strategies are dynamically generated based on user descriptions.
+
+## Quick Start
+
 ```python
-from a_stock_query_v2 import get_stock_info
-print(get_stock_info('601318'))  # 中国平安
-```
+# Basic stock query
+from ai_trade import get_stock_info
+stock_info = get_stock_info('STOCK_CODE')  # e.g., '601318', '600519', etc.
 
-### Get MA (Moving Average) Data
-```python
-from a_stock_query_v2 import get_stock_ma
+# Get MA (Moving Average) data
+from ai_trade import get_stock_ma
+ma_data = get_stock_ma('STOCK_CODE')
+# Returns: {'MA5': value, 'MA10': value, 'MA20': value, ...}
 
-ma_data = get_stock_ma('601318')
-# Returns: {'MA5': 65.49, 'MA10': 66.39, 'MA20': 68.62, 'current_price': 63.9}
-```
-
-### Create Strategies from Natural Language
-```python
-from a_stock_query_v2 import get_strategy_api
-
+# Create custom strategy from natural language
+from ai_trade import get_strategy_api
 api = get_strategy_api()
-api.create_strategy('新增战法-筛选:王子战法 阴线且MA5大于MA10且换手率大于5%')
-# Automatically generates Python code for the strategy
-```
+api.create_strategy('新增战法-筛选:YOUR_STRATEGY_NAME YOUR_DESCRIPTION')
+# Replace YOUR_STRATEGY_NAME and YOUR_DESCRIPTION
 
-### Scan Entire Market
-```python
-from a_stock_query_v2 import StockScanner, EnhancedStockAPI
-
+# Scan entire market
+from ai_trade import StockScanner
 scanner = StockScanner()
-api = EnhancedStockAPI()
-
-# Get all 5506 A-shares
-all_stocks = scanner.get_all_stocks()
-
-# Filter with real data
-results = [s for s in all_stocks if s['change_percent'] > 5.0]
+all_stocks = scanner.get_all_stocks()  # All 5506 A-shares
 ```
 
-## 📦 Module Structure
+## Module Structure
 
 ```
 scripts/              # Core functionality
@@ -59,204 +48,212 @@ scripts/              # Core functionality
 strategies/           # Strategy system (standalone)
 ├── strategy_api.py     # Strategy API
 ├── strategy_manager.py # Strategy manager
-├── strategy_generator.py # Code generator
+├── strategy_generator.py # Code generator from natural language
 ├── builtin/           # Built-in strategies
-└── custom/            # User strategies
+└── custom/            # User-created strategies
 
 assistant/            # AI assistant
 └── ai_stock_assistant.py
 
 demos/               # Demo scripts
 docs/                # Documentation
-├── USER_GUIDE.md       # User manual
-└── STRATEGY_GUIDE.md  # Strategy system guide
 ```
 
-## 💡 Common Use Cases
+## Stock Query APIs
 
-### Query Stock Price
-User: "现在中国平安什么价格？"
+### Single Stock Query
 ```python
-from quick_import import get_stock_info
-get_stock_info('601318')
-# Returns: 中国平安(601318) 当前价格: ¥63.90, 涨跌幅: -1.39%
+from ai_trade import get_stock_info, analyze_stock
+
+# Get basic info
+info = get_stock_info('STOCK_CODE')
+
+# Get detailed analysis
+analysis = analyze_stock('STOCK_CODE')
 ```
 
-### Create Strategy
-User: "帮我创建一个战法：阴线且换手率大于3%"
+### Batch Query
 ```python
-from strategies import get_strategy_api
-api = get_strategy_api()
-api.create_strategy('新增战法-筛选:回调战法 阴线且换手率大于3%')
-```
+from ai_trade import StockScanner, EnhancedStockAPI
 
-### Scan Market
-User: "找出所有涨幅超过5%且换手率大于3%的股票"
-```python
-from a_stock_query_v2 import StockScanner, EnhancedStockAPI
 scanner = StockScanner()
 api = EnhancedStockAPI()
 
-stocks = scanner.get_all_stocks()
-qualified = []
-for stock in stocks[:500]:  # Scan in batches
-    detail = api.get_stock_detail_em(stock['code'])
-    if detail['change_percent'] > 5 and detail['turnover_rate'] > 3:
-        qualified.append(detail)
+# Get all stocks
+all_stocks = scanner.get_all_stocks()
+
+# Filter with custom conditions
+results = [s for s in all_stocks if YOUR_CONDITION_HERE]
 ```
 
-## 🔑 Strategy System
+## Strategy System
 
-### Creating Strategies
+The strategy system is **completely flexible** - create any screening criteria from natural language.
 
-**Format**: `新增战法-筛选:战法名称 描述`
+### Create Strategy Format
 
-**Supported Syntax**:
-- MA conditions: `MA5大于MA10`, `MA20<MA30`
-- Candlestick: `阴线`, `阳线`, `十字星`
-- Turnover: `换手率大于5%`, `换手率>10`
-- Volume: `成交量大于10000`
-- Combine: use `且` to connect conditions
+**Pattern**: `新增战法-筛选:STRATEGY_NAME DESCRIPTION`
 
-**Example Strategies**:
-1. **王子战法** - 阴线且MA5大于MA10且换手率大于5%
-2. **活跃股回调** - 阴线且MA5大于MA10且换手率大于2%
+**Supported Syntax Components**:
+- MA conditions: `MA5大于MA10`, `MA20<MA30`, `MA5>MA20`, etc.
+- Candlestick patterns: `阴线`, `阳线`, `十字星`
+- Turnover rate: `换手率大于N%`, `换手率>N`, `换手率<N`
+- Volume: `成交量大于N`
+- Logical connectors: `且` (AND) to combine conditions
 
-### Managing Strategies
+### Strategy Creation Examples
 
 ```python
-from strategies import get_strategy_api
+from ai_trade import get_strategy_api
+api = get_strategy_api()
+
+# Example 1: Simple strategy
+api.create_strategy('新增战法-筛选:MY_STRATEGY 阴线且换手率大于5%')
+
+# Example 2: Complex strategy
+api.create_strategy('新增战法-筛选:ANOTHER_STRATEGY MA5大于MA20且阳线且成交量大于10000')
+
+# Example 3: Any combination
+api.create_strategy('新增战法-筛选:CUSTOM_NAME CONDITION1且CONDITION2且CONDITION3')
+```
+
+**IMPORTANT**: Replace strategy names and conditions with your actual requirements. The system will generate appropriate Python code.
+
+### Strategy Management
+
+```python
+from ai_trade import get_strategy_api
 api = get_strategy_api()
 
 # List all strategies
 api.list_strategies()
 
-# Get strategy info
-api.get_strategy_info('王子战法')
+# Get strategy details
+api.get_strategy_info('STRATEGY_NAME')
 
 # Delete strategy
-api.delete_strategy('旧战法')
+api.delete_strategy('STRATEGY_NAME')
 
-# Export strategy (for sharing)
-api.export_strategy('王子战法', './my_strategy.py')
+# Export strategy for sharing
+api.export_strategy('STRATEGY_NAME', './path/to/export.py')
 
-# Import strategy
-api.import_strategy('./shared.py', '新战法')
+# Import strategy from file
+api.import_strategy('./path/to/strategy.py', 'STRATEGY_NAME')
 ```
 
-## 📊 Data Sources
+### Use Strategy for Screening
 
-| Data | Source | Status |
-|------|--------|--------|
-| Price, Change | Tencent/Sina APIs | ✅ Real-time |
-| Turnover Rate | Eastmoney API (f168 field) | ✅ Real-time |
-| Volume | Eastmoney API | ✅ Real-time |
-| Market Cap | Eastmoney API | ✅ Real-time |
-| MA values | AKShare (historical data) | ✅ Available |
+```python
+from ai_trade import get_strategy_api, StockScanner, batch_get_stock_ma
 
-**Important**: Turnover rate is REAL data from Eastmoney API. MA values are calculated from AKShare historical data.
+api = get_strategy_api()
+scanner = StockScanner()
 
-## 📋 Stock Codes
+# Get all stocks
+all_stocks = scanner.get_all_stocks(limit=100)  # Adjust limit as needed
 
-- Shanghai: 6xxxxx (e.g., 601318 = 中国平安, 600519 = 贵州茅台)
-- Shenzhen: 000xxx, 002xxx, 300xxx (e.g., 000001 = 平安银行, 002594 = 比亚迪, 300750 = 宁德时代)
+# Get MA data for stocks
+ma_data = batch_get_stock_ma([s['code'] for s in all_stocks])
 
-No prefix needed - auto-detects market.
+# Apply strategy
+strategy = api.get_strategy('STRATEGY_NAME')
+results = []
+for stock in all_stocks:
+    ma = ma_data.get(stock['code'], {})
+    if strategy.screen(stock, ma5=ma.get('MA5'), ma20=ma.get('MA20'),
+                      turnover_rate=stock.get('turnover_rate', 0)):
+        results.append(stock)
+```
 
-## 🎯 Strategy Format & Export
+## Data Sources
 
-Strategies are saved as standalone Python files:
+| Data Type | Source | Availability |
+|-----------|--------|--------------|
+| Price, Change % | Tencent/Sina APIs | Real-time |
+| Turnover Rate | Eastmoney API (field f168) | Real-time |
+| Volume | Eastmoney API | Real-time |
+| Market Cap | Eastmoney API | Real-time |
+| MA Values | AKShare (historical K-line) | Calculated |
+
+**Note**: MA values are calculated from historical data fetched via AKShare, with 1-second delay between requests to avoid rate limiting.
+
+## Stock Code Format
+
+- Shanghai: 6xxxxx (e.g., 601318, 600519)
+- Shenzhen: 000xxx, 002xxx, 300xxx (e.g., 000001, 002594, 300750)
+
+No prefix needed - system auto-detects market.
+
+## Strategy File Format
+
+Generated strategies are standalone Python files:
 
 ```python
 """
-战法名称: 我的战法
-战法描述: 阴线且换手率大于5%
+战法名称: STRATEGY_NAME
+战法描述: DESCRIPTION
 作者: AI
+版本: 1.0.0
 """
-STRATEGY_NAME = "我的战法"
-STRATEGY_DESCRIPTION = "阴线且换手率大于5%"
+
+STRATEGY_NAME = "STRATEGY_NAME"
+STRATEGY_DESCRIPTION = "DESCRIPTION"
 STRATEGY_AUTHOR = "AI"
 STRATEGY_VERSION = "1.0.0"
 
+def get_default_params():
+    return {
+        # Strategy parameters
+    }
+
+def get_params_schema():
+    return {
+        # Parameter schema
+    }
+
 def screen(stock_data, **params):
     # Screening logic
-    return True
+    return all(conditions_met)
 ```
 
-**Export/Import** for sharing:
-```python
-# Export
-api.export_strategy('我的战法', './my_strategy.py')
+## Important Notes
 
-# Import
-api.import_strategy('./friend_strategy.py', '朋友战法')
-```
+1. **Flexible System**: This framework does NOT impose fixed strategies or patterns. All strategies are user-defined.
+2. **MA Data Delay**: AKShare requests have 1-second delays to comply with data source policies.
+3. **Request Limits**: Avoid excessive rapid requests to prevent rate limiting.
+4. **Market Hours**: Real-time data only available during Chinese market hours.
+5. **Strategy Parameters**: MA values must be obtained separately via `get_stock_ma()` or `batch_get_stock_ma()`.
 
-## ⚙️ Quick Import for Claude
+## Best Practices
 
-```python
-# Single line import for all functionality
-from quick_import import (
-    get_stock_info,
-    analyze_stock,
-    get_strategy_api,
-    EnhancedStockAPI,
-    StockScanner
-)
-```
+1. **Simple Query**: Use `get_stock_info(code)` for basic price info
+2. **Analysis**: Use `analyze_stock(code)` for detailed technical analysis
+3. **Custom Screening**: Create strategies with natural language, then apply to market scan
+4. **Batch Operations**: Use `batch_get_stock_ma()` for multiple stocks to minimize API calls
+5. **Export/Import**: Use strategy export/import to share custom strategies
 
-## 📚 Documentation
+## Technical Details
 
-- [user_guide.md](docs/user_guide.md) - Complete user manual
-- [strategy_guide.md](docs/strategy_guide.md) - Strategy system guide
-
-## 🔧 Technical Details
-
-### Turnover Rate Data
+### Turnover Rate
 - **Source**: Eastmoney API field f168
-- **Format**: Needs division by 100 (e.g., 57 → 0.57%)
-- **Verified**: ✅ Tested against calculated values
+- **Format**: Raw value divided by 100 (e.g., 57 → 0.57%)
+- **Verification**: Tested against calculated values with < 0.1% error
 
 ### Market Scanner
-- **Total A-shares**: 5506 stocks
-- **API**: Eastmoney market list
-- **Batch processing**: Supports concurrent scanning
+- **Coverage**: All 5506 Chinese A-share stocks
+- **API**: Eastmoney market list API with pagination
+- **Pagination**: Automatically handles API's 100-record limit
 
-## ⚠️ Important Notes
+### MA Calculation
+- **Source**: AKShare `stock_zh_a_hist()` for historical K-line data
+- **Method**: Pandas rolling window calculation
+- **Delay**: 1 second between requests (configurable via `delay` parameter)
 
-1. **MA Values**: Currently simulated (need historical data API)
-2. **Request Limits**: Avoid excessive requests to prevent rate limiting
-3. **Trading Hours**: Data only available during market hours
-4. **Strategy Parameters**: MA values must be provided externally (not in real-time data)
+## Version
 
-## 🎯 Best Practices for Claude
-
-1. **For Simple Queries**: Use `get_stock_info(code)` - fastest
-2. **For Analysis**: Use `analyze_stock(code)` - detailed insights
-3. **For Screening**: Use strategies with `get_strategy_api()`
-4. **For Market Scan**: Use `StockScanner` with filters
-5. **For Custom Strategies**: Use natural language description
-
-## 🔄 Version
-
-**v2.0.0** - Current
+**Current**: v2.0.0
 - Refactored module structure
-- Real turnover rate data
-- Full market scanning
-- Strategy system standalone
-
-## 📞 Example Session
-
-```
-User: 现在贵州茅台什么价格？
-Claude: [Uses get_stock_info('600519')]
-Claude: 贵州茅台(600519) 当前价格: ¥1337.00, 涨跌幅: -0.23%
-
-User: 创建一个战法：阳线且换手率大于10%
-Claude: [Uses get_strategy_api().create_strategy(...)]
-Claude: ✓ 战法 "阳线高换手" 创建成功
-
-User: 筛选换手率大于5%的所有股票
-Claude: [Uses StockScanner + EnhancedStockAPI]
-Claude: 找到 15 只符合条件的股票...
-```
+- Real turnover rate integration
+- Full market scanning capability
+- Standalone strategy system
+- AKShare integration for MA data

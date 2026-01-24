@@ -117,7 +117,7 @@ class MADataAPI:
             'date': latest['date'],
         }
 
-    def batch_get_ma(self, symbols: List[str], delay: float = 0.1) -> Dict[str, Dict]:
+    def batch_get_ma(self, symbols: List[str], delay: float = 1.0) -> Dict[str, Dict]:
         """
         批量获取MA数据
 
@@ -240,7 +240,7 @@ if __name__ == '__main__':
     # 测试3: 批量获取
     print("\n【测试3】批量获取MA数据")
     symbols = ['601318', '600519', '000001', '002594']
-    results = api.batch_get_ma(symbols, delay=0.5)
+    results = api.batch_get_ma(symbols, delay=1.0)
 
     print(f"\n成功获取 {len(results)} 只股票的MA数据")
     for symbol, data in results.items():
