@@ -3,13 +3,12 @@
 演示脚本 - 展示框架功能
 """
 import sys
-import io
-
-# 设置UTF-8编码
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+import os
 
 # 导入assistant模块
 sys.path.insert(0, '..')
+from scripts.encoding_helper import auto_setup
+auto_setup()
 from assistant import AIStockAssistant, get_stock_info, analyze_stock
 
 

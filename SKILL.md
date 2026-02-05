@@ -43,7 +43,8 @@ scripts/              # Core functionality
 ├── stock_api_enhanced.py # Enhanced API (Eastmoney with turnover rate)
 ├── stock_scanner.py     # Market scanner (5506 A-shares)
 ├── stock_ma_data.py     # MA historical data (AKShare integration)
-└── technical_indicators.py # Technical indicators
+├── technical_indicators.py # Technical indicators
+└── encoding_helper.py   # UTF-8 encoding support for Windows
 
 strategies/           # Strategy system (standalone)
 ├── strategy_api.py     # Strategy API
@@ -56,6 +57,7 @@ assistant/            # AI assistant
 └── ai_stock_assistant.py
 
 demos/               # Demo scripts
+tests/               # Test scripts
 docs/                # Documentation
 ```
 
@@ -167,13 +169,13 @@ for stock in all_stocks:
 
 ## Data Sources
 
-| Data Type | Source | Availability |
-|-----------|--------|--------------|
-| Price, Change % | Tencent/Sina APIs | Real-time |
-| Turnover Rate | Eastmoney API (field f168) | Real-time |
-| Volume | Eastmoney API | Real-time |
-| Market Cap | Eastmoney API | Real-time |
-| MA Values | AKShare (historical K-line) | Calculated |
+| Data Type | Source | API | Availability |
+|-----------|--------|-----|--------------|
+| Price, Change % | Tencent/Sina | stock_api.py | Real-time |
+| Turnover Rate | Eastmoney | stock_api_enhanced.py (f168) | Real-time |
+| Volume | Eastmoney | stock_api_enhanced.py | Real-time |
+| Market Cap | Eastmoney | stock_api_enhanced.py | Real-time |
+| MA Values | AKShare | stock_ma_data.py | Historical (calculated) |
 
 **Note**: MA values are calculated from historical data fetched via AKShare, with 1-second delay between requests to avoid rate limiting.
 
@@ -223,6 +225,7 @@ def screen(stock_data, **params):
 3. **Request Limits**: Avoid excessive rapid requests to prevent rate limiting.
 4. **Market Hours**: Real-time data only available during Chinese market hours.
 5. **Strategy Parameters**: MA values must be obtained separately via `get_stock_ma()` or `batch_get_stock_ma()`.
+6. **Encoding**: When running scripts directly on Windows, Chinese characters are handled automatically via encoding_helper.
 
 ## Best Practices
 
@@ -231,6 +234,31 @@ def screen(stock_data, **params):
 3. **Custom Screening**: Create strategies with natural language, then apply to market scan
 4. **Batch Operations**: Use `batch_get_stock_ma()` for multiple stocks to minimize API calls
 5. **Export/Import**: Use strategy export/import to share custom strategies
+
+## Creating Your Own Scripts
+
+When creating standalone scripts that use this framework:
+
+```python
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+import sys
+import os
+
+# Add parent directory to path
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+# Setup UTF-8 encoding (important for Windows)
+from scripts.encoding_helper import auto_setup
+auto_setup()
+
+# Now import and use the framework
+from assistant import get_stock_info, analyze_stock
+from scripts.stock_ma_data import get_stock_ma
+
+# Your code here...
+print(get_stock_info('601318'))
+```
 
 ## Technical Details
 
@@ -251,9 +279,33 @@ def screen(stock_data, **params):
 
 ## Version
 
-**Current**: v2.0.0
-- Refactored module structure
-- Real turnover rate integration
-- Full market scanning capability
-- Standalone strategy system
-- AKShare integration for MA data
+**Current**: v2.1.0
+- ✅ Added encoding_helper for automatic UTF-8 support on Windows
+- ✅ Cleaned up project structure (removed temporary files)
+- ✅ Updated all scripts to use unified encoding handling
+- ✅ Refactored module structure
+- ✅ Real turnover rate integration
+- ✅ Full market scanning capability
+- ✅ Standalone strategy system
+- ✅ AKShare integration for MA data
+
+## Troubleshooting
+
+### Chinese characters display as garbled text
+**Solution**: The encoding_helper module handles this automatically. If you still have issues:
+```python
+from scripts.encoding_helper import auto_setup
+auto_setup()
+```
+
+### MA data returns None
+**Causes**:
+- Stock suspended or newly listed (insufficient trading days)
+- Network issues with AKShare
+**Solution**: Use try-except and check if MA values exist before using them
+
+### Strategy creation fails
+**Common issues**:
+- Invalid strategy name (use only letters, numbers, underscores)
+- Incompatible conditions (e.g., conflicting MA requirements)
+**Solution**: Check strategy syntax against supported patterns in Strategy System section

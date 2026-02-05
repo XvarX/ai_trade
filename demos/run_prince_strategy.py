@@ -3,6 +3,8 @@
 import sys
 import os
 sys.path.insert(0, os.path.dirname(__file__))
+from scripts.encoding_helper import auto_setup
+auto_setup()
 
 from scripts import StockScanner, EnhancedStockAPI
 from strategies.custom import 王子战法

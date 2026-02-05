@@ -4,11 +4,11 @@
 """
 import sys
 import os
-import io
 
 # 添加当前目录到路径
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+from scripts.encoding_helper import auto_setup
+auto_setup()
 
 # 从__init__导入所有功能
 from __init__ import (

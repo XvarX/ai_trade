@@ -3,7 +3,11 @@
 """
 import sys
 import os
+
+# 设置UTF-8编码输出
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from scripts.encoding_helper import auto_setup
+auto_setup()
 
 from assistant import AIStockAssistant, get_stock_info, analyze_stock
 from scripts.technical_indicators import TechnicalIndicators, StockScreener

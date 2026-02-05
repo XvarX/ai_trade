@@ -2,8 +2,8 @@
 """验证框架功能"""
 import sys
 import os
-import io
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+from scripts.encoding_helper import auto_setup
+auto_setup()
 
 from strategies import get_strategy_api
 from scripts import get_all_stocks, EnhancedStockAPI

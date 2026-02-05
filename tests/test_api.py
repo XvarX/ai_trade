@@ -2,13 +2,12 @@
 测试脚本 - 验证框架功能
 """
 import sys
-import io
-
-# 设置UTF-8编码输出
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+import os
 
 # 导入路径
 sys.path.insert(0, '..')
+from scripts.encoding_helper import auto_setup
+auto_setup()
 
 
 def test_dependencies():

@@ -4,11 +4,14 @@ MA数据使用示例 - 展示如何获取和使用MA均线数据
 """
 import sys
 import os
-import io
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
-from a_stock_query_v2 import get_stock_ma, MADataAPI, batch_get_stock_ma, EnhancedStockAPI
+# 设置路径和编码
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from scripts.encoding_helper import auto_setup
+auto_setup()
+
+from scripts.stock_ma_data import get_stock_ma, MADataAPI, batch_get_stock_ma
+from scripts.stock_api_enhanced import EnhancedStockAPI
 
 
 def example_1_get_single_stock_ma():

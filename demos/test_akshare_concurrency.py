@@ -13,6 +13,10 @@ from datetime import datetime
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, parent_dir)
 
+# 设置UTF-8编码
+from scripts.encoding_helper import auto_setup
+auto_setup()
+
 from scripts.stock_ma_data import MADataAPI
 
 

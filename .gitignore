@@ -50,7 +50,3 @@ exported_*.py
 # Claude
 .claude/
 *.session
-
-# OS
-.DS_Store
-Thumbs.db
